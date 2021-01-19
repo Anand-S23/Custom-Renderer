@@ -22,5 +22,4 @@ typedef i32 b32;
 #define global static
 #define local_persist static
 
-
 #endif

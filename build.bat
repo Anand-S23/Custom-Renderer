@@ -1,13 +1,12 @@
 @echo off
 
-set glfw=w:\glfw\include
-set glad=w:\glad\include
-set glfw_lib=W:\glfw\glfw\lib-vc2019
-set glad_src=w:\glad\src
+set sdl=..\..\SDL2
+set sdl_lib=%sdl%\lib\solo_x64
+set glew=..\..\glew
 
 set compiler_options=/nologo /FC /Zi /MD
-set linker_options=user32.lib gdi32.lib Shell32.lib winmm.lib
-set external=%glad_src%/glad.c %glfw_lib%/glfw3.lib %glfw_lib%/glfw3dll.lib -I%glad% -I%glfw%
+set linker_options=user32.lib gdi32.lib Shell32.lib winmm.lib opengl32.lib
+set external=-I%sdl%\include -I%glew%\include %sdl_lib%\SDL2.lib %sdl_lib%\SDL2main.lib %glew%\lib\glew32.lib
 
 set build_file=../src/win32_platform.c
 
