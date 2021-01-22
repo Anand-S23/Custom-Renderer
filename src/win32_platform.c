@@ -4,15 +4,16 @@
 
 #include "win32_platform.h" 
 
-global b32 Global_Running;
+global platform Global_Platform = {0};
 
-const char *vertex_shader_source = "#version 330 core\n"
+global const char *vertex_shader_source = "#version 330 core\n"
     "layout (location = 0) in vec3 pos;\n"
     "void main()\n"
     "{\n"
     "   gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);\n"
     "}\0";
-const char *fragment_shader_source = "#version 330 core\n"
+
+global const char *fragment_shader_source = "#version 330 core\n"
     "out vec4 frag_color;\n"
     "void main()\n"
     "{\n"
@@ -26,7 +27,61 @@ internal void HandleEvent(SDL_Event *event)
     {
         case SDL_QUIT:
         {
-            Global_Running = 0;
+            Global_Platform.running = 0;
+        } break;
+
+        case SDL_KEYUP:
+        case SDL_KEYDOWN:
+        {
+            if (event->key.repeat == 0)
+            {
+                // TODO: Keyboard input
+                switch (event->key.keysym.scancode)
+                {
+                }
+           }
+        } break;
+
+        case SDL_MOUSEBUTTONDOWN:
+        {
+            if (event->button.button == SDL_BUTTON_LEFT)
+            {
+                Global_Platform.left_mouse_down = 1;
+            }
+
+            else if (event->button.button == SDL_BUTTON_RIGHT)
+            {
+                Global_Platform.right_mouse_down = 1;
+            }
+
+            else if (event->button.button == SDL_BUTTON_MIDDLE)
+            {
+                Global_Platform.middle_mouse_down = 1;
+            }
+        } break;
+
+        case SDL_MOUSEBUTTONUP:
+        {
+            if (event->button.button == SDL_BUTTON_LEFT)
+            {
+                Global_Platform.left_mouse_down = 0;
+            }
+
+            else if (event->button.button == SDL_BUTTON_RIGHT)
+            {
+                Global_Platform.right_mouse_down = 0;
+            }
+
+            else if (event->button.button == SDL_BUTTON_MIDDLE)
+            {
+                Global_Platform.middle_mouse_down = 0;
+            }
+        } break;
+
+        case SDL_MOUSEMOTION:
+        {
+            SDL_GetMouseState(&Global_Platform.mouse_x, 
+                              &Global_Platform.mouse_y);
         } break;
     }
 }
@@ -144,8 +199,8 @@ int main(int argc, char** argv)
 
             glBindVertexArray(0); 
 
-            Global_Running = 1;
-            while (Global_Running)
+            Global_Platform.running = 1;
+            while (Global_Platform.running)
             {
                 SDL_Event event;
                 while (SDL_PollEvent(&event))
