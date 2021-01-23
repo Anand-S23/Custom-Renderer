@@ -3,22 +3,9 @@
 #include <stdio.h>
 
 #include "win32_platform.h" 
+#include "app.c"
 
 global platform Global_Platform = {0};
-
-global const char *vertex_shader_source = "#version 330 core\n"
-    "layout (location = 0) in vec3 pos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);\n"
-    "}\0";
-
-global const char *fragment_shader_source = "#version 330 core\n"
-    "out vec4 frag_color;\n"
-    "void main()\n"
-    "{\n"
-    "   frag_color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
 
 // TODO: Add in keyboard and mouse input
 internal void HandleEvent(SDL_Event *event)
@@ -123,81 +110,6 @@ int main(int argc, char** argv)
                 printf("Error while initalizing glew");
             }
 
-            // Create vertex_shader
-            int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-            glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
-            glCompileShader(vertex_shader);
-
-            // Check for shader compile errors
-            int success;
-            char info_log[512];
-            glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-            if (!success)
-            {
-                glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
-                printf("Shader compile error: %s", info_log);
-            }
-
-            // fragment shader
-            int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-            glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
-            glCompileShader(fragment_shader);
-
-            // check for shader compile errors
-            glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-            if (!success)
-            {
-                glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
-                printf("Shader compile error: %s", info_log);
-            }
-            
-            // link shaders
-            int shader_program = glCreateProgram();
-            glAttachShader(shader_program, vertex_shader);
-            glAttachShader(shader_program, fragment_shader);
-            glLinkProgram(shader_program);
-
-            // check for linking errors
-            glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-            if (!success)
-            {
-                glGetProgramInfoLog(shader_program, 512, NULL, info_log);
-                printf("Shader link error: %s", info_log);
-            }
-
-            // Delete both shaders after linking
-            glDeleteShader(vertex_shader);
-            glDeleteShader(fragment_shader);
-
-            // set up vertex data
-            float vertices[] = {
-                // lower triangle
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                -0.5f,  0.5f, 0.0f,
-
-                // upper triangle
-                -0.5f, 0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.5f,  0.5f, 0.0f
-            }; 
-
-            unsigned int VBO, VAO;
-            glGenVertexArrays(1, &VAO);
-            glGenBuffers(1, &VBO);
-            glBindVertexArray(VAO);
-
-            glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
-                         vertices, GL_STATIC_DRAW);
-
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                                  3 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(0);
-
-            glBindBuffer(GL_ARRAY_BUFFER, 0); 
-
-            glBindVertexArray(0); 
 
             Global_Platform.running = 1;
             while (Global_Platform.running)
@@ -208,19 +120,14 @@ int main(int argc, char** argv)
                     HandleEvent(&event);
                 }
 
-                glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT);
-
-                glUseProgram(shader_program);
-                glBindVertexArray(VAO);
-                glDrawArrays(GL_TRIANGLES, 0, 6);
+                UpdateApp(&Global_Platform);
 
                 SDL_GL_SwapWindow(window);
             }
 
-            glDeleteVertexArrays(1, &VAO);
-            glDeleteBuffers(1, &VBO);
-            glDeleteProgram(shader_program);
+            // glDeleteVertexArrays(1, &VAO);
+            // glDeleteBuffers(1, &VBO);
+            // glDeleteProgram(shader_program);
         }
         else
         {
