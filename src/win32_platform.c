@@ -1,8 +1,10 @@
 #include <SDL.h>
 #include <GL/glew.h>
+#include <windows.h>
 #include <stdio.h>
 
 #include "win32_platform.h" 
+#include "math.h"
 #include "app.c"
 
 global platform Global_Platform = {0};
@@ -110,6 +112,16 @@ int main(int argc, char** argv)
                 printf("Error while initalizing glew");
             }
 
+            Global_Platform.storage_size = Megabytes(64); 
+            Global_Platform.transient_storage_size = Megabytes(100);
+
+            Global_Platform.storage = VirtualAlloc(0, Global_Platform.storage_size,
+                                                   MEM_RESERVE | MEM_COMMIT,
+                                                   PAGE_READWRITE);
+
+            Global_Platform.transient_storage = VirtualAlloc(0, Global_Platform.transient_storage_size,
+                                                             MEM_RESERVE | MEM_COMMIT,
+                                                             PAGE_READWRITE);
 
             Global_Platform.running = 1;
             while (Global_Platform.running)

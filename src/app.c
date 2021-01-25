@@ -58,6 +58,21 @@ internal void UpdateApp(platform *platform)
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    SetData(state, vertices);
-    DisplayProgram(state, 6);
+    // SetData(state, vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, state->VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
+                 vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                          3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0); 
+
+    glBindVertexArray(0); 
+
+    // DisplayProgram(state, 6);
+    glUseProgram(state->shader_program);
+    glBindVertexArray(state->VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
